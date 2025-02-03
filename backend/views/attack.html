@@ -1,24 +1,396 @@
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="attack.html">FortiLLM</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="attack.html">Run Attack</a></li>
-                    <li class="nav-item"><a class="nav-link" href="dashboard.html">View Results</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FortiLLM Test Runner</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        display: flex;
+        background-color: #f8f9fa;
+        font-family: "Arial", sans-serif;
+      }
+      #sidebar {
+        width: 250px;
+        background: #212529;
+        color: white;
+        height: 100vh;
+        padding: 15px;
+        position: fixed;
+        transition: width 0.3s ease, background 0.3s ease;
+        overflow: hidden;
+        border-radius: 10px 0 0 10px;
+      }
+      #sidebar.collapsed {
+        width: 70px;
+      }
+      #sidebar a {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        margin: 5px 0;
+        border-radius: 5px;
+        white-space: nowrap;
+        transition: background 0.3s, color 0.3s;
+      }
+      #sidebar a i {
+        font-size: 20px;
+        margin-right: 10px;
+      }
+      #sidebar.collapsed a span {
+        display: none;
+      }
+      #sidebar a:hover {
+        background: #495057;
+        color: #f8f9fa;
+      }
+      #toggleSidebar {
+        cursor: pointer;
+        color: white;
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      #content {
+        margin-left: 270px;
+        flex-grow: 1;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .navbar {
+        background: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .user-dropdown {
+        position: relative;
+      }
+      .user-dropdown img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 50px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+      .dropdown-menu a {
+        display: block;
+        padding: 10px;
+        text-decoration: none;
+        color: #212529;
+      }
+      .dropdown-menu a:hover {
+        background: #f1f1f1;
+      }
+      .table-container {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .progress-bar {
+        background-color: #17a2b8;
+      }
+      .progress-description {
+        text-align: center;
+        margin-top: 5px;
+        font-size: 14px;
+        color: #6c757d;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #6c757d;
+        text-align: center;
+      }
+      .footer a {
+        color: inherit;
+        text-decoration: none;
+        margin: 0 10px;
+      }
+      .footer a:hover {
+        color: #495057;
+      }
+      .testimonial {
+        background-color: #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        margin-top: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .testimonial p {
+        font-size: 16px;
+        color: #212529;
+        margin-bottom: 0;
+      }
+      .testimonial i {
+        color: #495057;
+        font-size: 20px;
+      }
+      @media (max-width: 768px) {
+        #content {
+          margin-left: 90px;
+        }
+        #sidebar.collapsed {
+          width: 60px;
+        }
+        #sidebar a i {
+          margin-right: 0;
+        }
+      }
+      body.dark-mode {
+    background-color: #121212;
+    color: #f8f9fa;
+}
+body.dark-mode .navbar {
+    background-color: #212529;
+}
+body.dark-mode #sidebar {
+    background: #343a40;
+}
+body.dark-mode .progress-bar {
+    background-color: #0dcaf0;
+}
 
-    <div class="container mt-5">
-        <h2>Run Attack</h2>
-        <select id="attackType" class="form-select">
-            <option value="injection">Prompt Injection</option>
-            <option value="mutation">Mutation Attack</option>
-        </select>
-        <input type="text" id="target" class="form-control mt-3" placeholder="Enter Target LLM API">
-        <button id="runAttack" class="btn btn-danger mt-3">Run Attack</button>
-        <pre id="attackOutput" class="mt-3"></pre>
+    </style>
+  </head>
+  <body>
+    <div id="sidebar">
+      <button id="toggleSidebar"><i class="bi bi-list"></i></button>
+      <a href="#"><i class="bi bi-speedometer2"></i><span> Dashboard</span></a>
+      <a href="#"><i class="bi bi-graph-up"></i><span> Analytics</span></a>
+      <a href="#"><i class="bi bi-gear"></i><span> Settings</span></a>
     </div>
-</body>
+
+    <div id="content">
+      <div class="navbar">
+        <h4>FortiLLM Test Runner</h4>
+        <div class="input-group" style="width: 300px">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search..."
+            aria-label="Search"
+            id="navbarSearch"
+          />
+          <button class="btn btn-outline-secondary" type="button">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+        <button id="toggleDarkMode" class="btn btn-dark btn-sm">
+            <i class="bi bi-moon"></i>
+        </button>
+        
+
+        <div class="user-dropdown">
+          <img src="https://via.placeholder.com/40" alt="User" id="userIcon" />
+          <div class="dropdown-menu" id="userDropdown">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Logout</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3 mt-4">
+        <div class="col-md-4">
+          <label for="application" class="form-label"
+            >Select Application Harness</label
+          >
+          <select id="application" class="form-select">
+            <option value="app1">Application 1</option>
+            <option value="app2">Application 2</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="intention" class="form-label">Select Intention</label>
+          <select id="intention" class="form-select">
+            <option value="int1">Intention 1</option>
+            <option value="int2">Intention 2</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button class="btn btn-primary w-100" id="runTest">Run Test</button>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div class="progress" style="height: 40px; position: relative">
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            style="width: 0%; transition: width 0.5s"
+            id="progressBar"
+          >
+            0%
+          </div>
+          <div
+            class="step-markers"
+            style="position: absolute; width: 100%; top: 0; height: 40px"
+          >
+            <span
+              class="step-marker"
+              style="
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 10px;
+                height: 40px;
+                background: #17a2b8;
+                border-radius: 50%;
+              "
+            ></span>
+            <span
+              class="step-marker"
+              style="
+                position: absolute;
+                left: 50%;
+                top: 0;
+                width: 10px;
+                height: 40px;
+                background: #17a2b8;
+                border-radius: 50%;
+              "
+            ></span>
+            <span
+              class="step-marker"
+              style="
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 10px;
+                height: 40px;
+                background: #17a2b8;
+                border-radius: 50%;
+              "
+            ></span>
+          </div>
+        </div>
+
+        <div class="progress-description" id="progressDescription">
+          Preparing test...
+        </div>
+      </div>
+
+      <h4 class="mt-4">Test Results</h4>
+      <div class="table-container mt-3">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>Best Chromosome</th>
+              <th>Best Framework</th>
+              <th>Best Separator</th>
+              <th>Best Disruptor</th>
+              <th>Fitness Score</th>
+            </tr>
+          </thead>
+          <tbody id="testResults">
+            <tr>
+              <td colspan="5" class="text-center">No results yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="testimonial mt-4">
+        <p>
+            <i class="bi bi-chat-right-quote-fill"></i> 
+            FortiLLM is trusted by developers worldwide to enhance LLM security. 
+            <strong>Join the revolution!</strong>
+        </p>
+    </div>
+    
+
+      <div class="footer">
+        <div
+          id="notifications"
+          style="position: fixed; bottom: 20px; right: 20px; z-index: 1000"
+        ></div>
+        FortiLLM &copy; 2025. Enhancing LLM Security through Advanced Testing.
+        <a href="#" target="_blank" class="bi bi-facebook" style="margin-left: 10px;"></a>
+        <a href="#" target="_blank" class="bi bi-twitter" style="margin-left: 10px;"></a>
+        <a href="#" target="_blank" class="bi bi-linkedin" style="margin-left: 10px;"></a>
+    </div>
+    
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#toggleSidebar").click(function () {
+          $("#sidebar").toggleClass("collapsed");
+          $("#content").css(
+            "margin-left",
+            $("#sidebar").hasClass("collapsed") ? "90px" : "270px"
+          );
+        });
+
+        $("#userIcon").click(function () {
+          $("#userDropdown").toggle();
+        });
+
+        $("#runTest").click(function () {
+          $("#progressBar").css("width", "50%").text("50%");
+          $("#progressDescription").text("Running test...");
+          setTimeout(() => {
+            $("#progressBar").css("width", "100%").text("100%");
+            $("#progressDescription").text("Test completed successfully!");
+            alert("Test Completed!");
+          }, 2000);
+        });
+      });
+      function showNotification(message, type = "success") {
+        const notification = $(`
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="min-width: 250px;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `);
+        $("#notifications").append(notification);
+        setTimeout(() => notification.alert("close"), 3000);
+      }
+
+      // Example usage inside #runTest
+      $("#runTest").click(function () {
+        $("#progressBar").css("width", "50%").text("50%");
+        showNotification("Test started...");
+        setTimeout(() => {
+          $("#progressBar").css("width", "100%").text("100%");
+          showNotification("Test completed successfully!", "success");
+        }, 2000);
+      });
+      $('#toggleDarkMode').click(function() {
+    $('body').toggleClass('dark-mode');
+    const icon = $('body').hasClass('dark-mode') ? 'bi-sun' : 'bi-moon';
+    $(this).html(`<i class="bi ${icon}"></i>`);
+});
+
+    </script>
+  </body>
+</html>
