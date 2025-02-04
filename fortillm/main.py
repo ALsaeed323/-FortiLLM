@@ -5,7 +5,6 @@ import openai
 import requests  # <-- Add this import to send HTTP requests
 from constant.chromosome import Chromosome
 from harness.base_harness import Harness
-from harness.WriteSonicHarness import WriteSonicHarness
 from harness.demo_translator_harness import TranslatorHarness
 from intention.base_intention import Intention
 from intention.prompt_leakage import PromptLeakage
@@ -58,7 +57,7 @@ def send_results_to_backend(chromosome):
 
 def main():
     # Initialize prompt injection intention and harness
-    intention = PrefilledAttack()
+    intention = ContentManipulation()
     application_harness = TranslatorHarness()
 
     # Begin the prompt injection process

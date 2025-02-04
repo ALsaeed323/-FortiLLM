@@ -1,0 +1,16 @@
+{
+  "GEMINI_API_URL": "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+  "GEMINI_API_KEYS": [
+    "AIzaSyDWEnp0QPcjJ5JHc4H1SR5rare1ahJSreg",
+    "AIzaSyDFgRBfY-DedAoOoJgC06Jjq2Df8z-deHk",
+    "AIzaSyCjFLPCrqm0XiG0GwZzw342qd0TmMno5qk",
+    "AIzaSyA9HfAoMU0_2EBJrS7kAGGNBOJBKnoPZv8",
+    "AIzaSyBmByeQhXhS_aPRhw5aIcvKi_deg_jC48Y",
+    "AIzaSyAM0MjnaNe4qKKVV5TSnJUCynKKwN__T_c",
+    "AIzaSyBvlBaIds5OR2vyvIKSdAi82hD368Po53A",
+    "AIzaSyDUCuAwZWwg__V42xFINNfB9slFWQtTNU4",
+    "AIzaSyA95mD9Do-u19yeUw8r9BH8UXJ9lk3IVQQ",
+    "AIzaSyDPRuwW_oDJ_GGYy178nNGrzhSur4cQPbg",
+    "AIzaSyAVo6bGTak_sMzHG4_PSzgyET7p1phJWBM"
+  ]
+}
