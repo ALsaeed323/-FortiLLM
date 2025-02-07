@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FortiLLM Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #d9534f; /* Red theme for the project */
+            --primary-hover: #c43c39;
+            background: linear-gradient(45deg, rgba(10,15,26,0.5), rgba(26,32,44,0.4)),
+            url('fortillm.jpg') no-repeat center/cover fixed;
+            --surface: rgba(30, 41, 59, 0);
+            --surface-hover: rgba(51, 65, 85, 0.8);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #33415590;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        main {
+            flex-grow: 1;
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        #sidebar.collapsed + main {
+            margin-left: 88px;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .action-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: var(--surface-hover);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        .btn-generate {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-generate:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-user-action {
+            padding: 3px 8px;
+            margin: 0 2px;
+        }
+
+        .search-box {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        #sidebar {
+            width: 280px;
+            background: var(--surface);
+            backdrop-filter: blur(5px);
+            border-right: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+        }
+
+        #sidebar.collapsed {
+            width: 88px;
+        }
+
+        #logoText {
+            display: inline;
+        }
+
+        #sidebar.collapsed #logoText {
+            display: none;
+        }
+
+        .sidebar-link span {
+            display: inline;
+        }
+
+        #sidebar.collapsed .sidebar-link span {
+            display: none;
+        }
+
+        .sidebar-link {
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .sidebar-link:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .sidebar-link.active {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <aside id="sidebar" class="d-flex flex-column p-3">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="fs-5 fw-bold text-white" id="logoText">FortiLLM</span>
+            <button id="toggleSidebar" class="btn btn-link p-0">
+                <i class="bi bi-list text-white fs-4"></i>
+            </button>
+        </div>
+        <nav class="flex-grow-1 d-flex flex-column gap-2">
+            <a href="attack_page.html" class="sidebar-link">
+                <i class="bi bi-lightning-charge-fill fs-5"></i>
+                <span class="fw-medium">Run Attack</span>
+            </a>
+            <a href="dashboard.html" class="sidebar-link active">
+                <i class="bi bi-graph-up fs-5"></i>
+                <span class="fw-medium">Dashboard</span>
+            </a>
+            <a href="settings.html" class="sidebar-link">
+                <i class="bi bi-gear fs-5"></i>
+                <span class="fw-medium">Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>User Management Dashboard</h2>
+            <div class="d-flex gap-3">
+                <input type="text" class="form-control search-box" placeholder="Search users...">
+                <button class="btn btn-generate" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="bi bi-person-plus"></i> Add User
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Row -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="text-secondary">Total Users</div>
+                    <div class="stat-value">248</div>
+                    <small class="text-success">↑ 12% this month</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="text-secondary">Active Today</div>
+                    <div class="stat-value">84</div>
+                    <small class="text-warning">3 pending approvals</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="text-secondary">Total Attacks</div>
+                    <div class="stat-value">1,842</div>
+                    <small class="text-primary">All successful</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="text-secondary">Avg. Runs/User</div>
+                    <div class="stat-value">7.4</div>
+                    <small class="text-primary">Top user: 42 runs</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Charts -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-8">
+                <div class="glass-card">
+                    <h5 class="card-title mb-3">Attack Activity Timeline</h5>
+                    <div class="chart-container">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card">
+                    <h5 class="card-title mb-3">Top Performers</h5>
+                    <div class="chart-container">
+                        <canvas id="userChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Table -->
+        <div class="glass-card">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Last Active</th>
+                        <th>Total Runs</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="bi bi-person-circle user-avatar fs-4 text-white"></td>
+                        <td>
+                            <div>John Doe</div>
+                            <small class="text-secondary">john@40llm.com</small>
+                        </td>
+                        <td><span class="action-badge bg-primary">Admin</span></td>
+                        <td>2h ago</td>
+                        <td>42</td>
+                        <td><span class="text-success">●</span> Active</td>
+                        <td>
+                            <button class="btn btn-generate btn-user-action"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-danger btn-user-action"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-secondary btn-user-action"><i class="bi bi-activity"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination justify-content-end">
+                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="glass-card mt-4">
+            <h5 class="card-title mb-3">Recent User Activities</h5>
+            <div class="list-group">
+                <div class="list-group-item bg-transparent border-secondary">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <span class="fw-medium">John Doe</span> initiated new attack
+                            <small class="text-secondary">#00125 - Prompt Injection</small>
+                        </div>
+                        <small class="text-secondary">10m ago</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Create New User</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label>Email Address</label>
+                            <input type="email" class="form-control search-box">
+                        </div>
+                        <div class="mb-3">
+                            <label>User Role</label>
+                            <select class="form-select search-box">
+                                <option>Administrator</option>
+                                <option>Security Analyst</option>
+                                <option>Auditor</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-generate w-100">Send Invitation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Charts
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        new Chart(timelineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Successful Attacks',
+                    data: [65, 59, 80, 81, 56, 55],
+                    borderColor: 'var(--primary)',
+                    tension: 0.4
+                }]
+            }
+        });
+
+        const userCtx = document.getElementById('userChart').getContext('2d');
+        new Chart(userCtx, {
+            type: 'bar',
+            data: {
+                labels: ['John D.', 'Sarah M.', 'Mike R.', 'Emma J.'],
+                datasets: [{
+                    label: 'Successful Attacks',
+                    data: [42, 35, 28, 19],
+                    backgroundColor: 'var(--primary)'
+                }]
+            }
+        });
+
+        // Sidebar Toggle
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+    </script>
+</body>
+</html>
