@@ -1,11 +1,11 @@
-// ✅ Handle Sign-In
-const signinForm = document.getElementById("signinForm");
-if (signinForm) {
-    signinForm.addEventListener("submit", async (e) => {
+// ✅ Handle Sign-In 
+const signInForm = document.querySelector(".sign-in-container form");
+if (signInForm) {
+    signInForm.addEventListener("submit", async (e) => {
         e.preventDefault();  // Prevents page reload on form submission
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const email = signInForm.querySelector('input[name="email"]').value;
+        const password = signInForm.querySelector('input[name="password"]').value;
 
         try {
             const response = await fetch("http://127.0.0.1:5000/api/login", {
@@ -32,42 +32,25 @@ if (signinForm) {
 }
 
 // ✅ Handle Sign-Up
-const signupForm = document.getElementById("signupForm");
-if (signupForm) {
-    signupForm.addEventListener("submit", async (e) => {
+const signUpForm = document.querySelector(".sign-up-container form");
+if (signUpForm) {
+    signUpForm.addEventListener("submit", async (e) => {
         e.preventDefault();  // Prevents page reload on form submission
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const confirmPassword = document.getElementById("confirmPassword").value;
-        const termsAccepted = document.getElementById("terms").checked;
+        const name = signUpForm.querySelector('input[name="name"]').value;
+        const email = signUpForm.querySelector('input[name="email"]').value;
+        const password = signUpForm.querySelector('input[name="password"]').value;
 
-        // Check if passwords match
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        // Ensure terms are accepted
-        if (!termsAccepted) {
-            alert("You must agree to the Terms & Conditions.");
-            return;
-        }
-
-        // Get selected LLMs
-        const llmChoices = [];
-        document.querySelectorAll("input[name='llm']:checked").forEach((checkbox) => {
-            llmChoices.push(checkbox.value);
-        });
+        // You can add additional validations here if needed
 
         try {
             const response = await fetch("http://127.0.0.1:5000/api/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
+                    name,
                     email,
-                    password,
-                    llm_choices: llmChoices
+                    password
                 })
             });
 
@@ -75,7 +58,7 @@ if (signupForm) {
 
             if (response.ok) {
                 alert("Registration successful! Redirecting to Sign In...");
-                window.location.href = "signin.html";
+                window.location.href = "#";
             } else {
                 alert(result.error || "Sign-up failed! Please try again.");
             }

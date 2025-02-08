@@ -20,7 +20,6 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
-@token_required
 def run_attack_controller():
     """Handles running an attack and storing the result."""
     try:

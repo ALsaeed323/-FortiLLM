@@ -8,13 +8,14 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 def signup_controller():
     data = request.get_json()
+    print(data) # Debugging
     if not data or "email" not in data or "password" not in data:
         return jsonify({"error": "Missing email or password"}), 400
 
     if find_user_by_email(data["email"]):
         return jsonify({"error": "User already exists"}), 400
 
-    create_user(data["email"], data["password"])
+    create_user(data["name"],data["email"], data["password"])
     return jsonify({"message": "User registered successfully!"}), 201
 
 def login_controller():
