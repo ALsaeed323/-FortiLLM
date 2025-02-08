@@ -40,7 +40,7 @@ def run_attack_controller():
         error = result.stderr.strip()
 
         # Store attack results
-        store_attack_result(attack_type, target, output, error)
+        #store_attack_result(attack_type, target, output, error)
 
         return jsonify({"output": output, "error": error})
     

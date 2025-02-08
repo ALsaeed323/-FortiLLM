@@ -9,16 +9,16 @@ from harness.demo_translator_harness import TranslatorHarness
 from intention.base_intention import Intention
 from intention.prompt_leakage import PromptLeakage
 from iterative_prompt_optimization import IterativePromptOptimizer
-from intention.prefilled_attack import PrefilledAttack
+from intention.jail_break_override import JailbreakOverride
 from intention.content_manipulation import ContentManipulation
 
 logger = loguru.logger
 
 # Define constants for optimization process
-max_iteration = 50
+max_iteration = 2
 max_crossover = 0.1
 max_mutation = 0.5
-max_population = 5
+max_population = 10
 
 # Backend API URL (Update if running on a different server)
 BACKEND_URL = "http://127.0.0.1:5000/api/fortillm_results"
@@ -57,7 +57,7 @@ def send_results_to_backend(chromosome):
 
 def main():
     # Initialize prompt injection intention and harness
-    intention = ContentManipulation()
+    intention = JailbreakOverride()
     application_harness = TranslatorHarness()
 
     # Begin the prompt injection process

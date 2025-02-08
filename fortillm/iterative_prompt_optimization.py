@@ -81,6 +81,8 @@ class IterativePromptOptimizer:
     def combine_chromosome(
         self, chromosome1: Chromosome, chromosome2: Chromosome
     ) -> Chromosome:
+        logger.info(f"Chromosome 1: {chromosome1}")
+        logger.info(f"Chromosome 2: {chromosome2}")
         # Combine two chromosomes to create a new one by randomly selecting attributes
         disruptor = (
             chromosome1.disruptor
@@ -102,11 +104,15 @@ class IterativePromptOptimizer:
             if random.choice([True, False])
             else chromosome2.question_prompt
         )
+        logger.info(f"New Chromosome: Disruptor={disruptor}, Separator={separator}, Framework={framework}, Question Prompt={question_prompt}")
         return Chromosome(disruptor, separator, framework, question_prompt)
 
     def single_mutation_chromosome(self, chromosome: Chromosome) -> Chromosome:
         # Perform mutation on a single chromosome
+        logger.info(f"Before Mutation: Disruptor={chromosome.disruptor}, Separator={chromosome.separator}, Framework={chromosome.framework}, Question Prompt={chromosome.question_prompt}")
+
         llm_mutation_generation(chromosome)
+        logger.info(f"After Mutation: Disruptor={chromosome.disruptor}, Separator={chromosome.separator}, Framework={chromosome.framework}, Question Prompt={chromosome.question_prompt}")
 
     def mutation_chromosome(self, population: List[Chromosome]) -> List[Chromosome]:
         # Mutate the chromosomes in the population concurrently
@@ -161,6 +167,7 @@ class IterativePromptOptimizer:
         # Begin optimization iterations
         for iteration_num in range(self.iteration):
             logger.info(f"Start iteration: {iteration_num}")
+            logger.info("Start to crossover")
 
             if iteration_num > 0:
                 # Perform crossover to generate new chromosomes
@@ -168,8 +175,11 @@ class IterativePromptOptimizer:
                     idx1, idx2 = random.sample(range(len(population)), 2)
                     chromosome1 = population[idx1]
                     chromosome2 = population[idx2]
+                    logger.info(f"Perform crossover on chromosome {chromosome1} and {chromosome2}")
                     new_chromosome1 = self.combine_chromosome(chromosome1, chromosome2)
                     new_chromosome2 = self.combine_chromosome(chromosome1, chromosome2)
+                    logger.info(f"New chromosome 1: {new_chromosome1}")
+                    logger.info(f"New chromosome 2: {new_chromosome2}")
                     population.append(new_chromosome1)
                     population.append(new_chromosome2)
                 logger.info("Finish crossover")
