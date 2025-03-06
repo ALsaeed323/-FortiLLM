@@ -57,7 +57,7 @@ def send_results_to_backend(chromosome):
 
 def main():
     # Initialize prompt injection intention and harness
-    intention = JailbreakOverride()
+    intention = ContentManipulation()
     application_harness = TranslatorHarness()
 
     # Begin the prompt injection process
