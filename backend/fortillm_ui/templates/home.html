@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}FortiLLM - Home{% endblock %}
+
+{% block content %}
+  <!-- Hero Section -->
+  <section class="hero" role="banner">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" class="hero-logo" alt="FortiLLM Logo">
+    <h1>
+      <span class="typing" id="typing-text"></span>
+    </h1>
+    <p>Discover how FortiLLM uncovers vulnerabilities in LLM systems and protects against prompt injection attacks.</p>
+    <a href="{{ url_for('run_attack_page') }}" class="btn btn-primary">Explore FortiLLM →</a>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <h2 class="text-center">Key Features of FortiLLM</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="feature-box">
+            <i class="bi bi-bug"></i>
+            <h4>Vulnerability Detection</h4>
+            <p>FortiLLM identifies vulnerabilities in LLM applications through systematic black-box testing.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-box">
+            <i class="bi bi-code-slash"></i>
+            <h4>Prompt Injection Framework</h4>
+            <p>Leverage a three-component framework (Framework, Separator, Disruptor) to craft effective prompt injection attacks.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-box">
+            <i class="bi bi-shield-check"></i>
+            <h4>Mitigation Strategies</h4>
+            <p>FortiLLM uncovers vulnerabilities and introduces a defensive LLM to block adversarial attacks in real-time, securing LLM systems.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

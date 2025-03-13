@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}FortiLLM - Login{% endblock %}
+
+{% block content %}
+  <section class="register-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-6 col-lg-4">
+          <!-- Back Link -->
+          <a href="{{ url_for('home_page') }}" class="text-muted mb-4 d-block" style="font-size: 0.85rem;">← Back</a>
+
+          <!-- Logo -->
+          <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Grok Logo" class="img-fluid" style="max-width: 100px;">
+          </div>
+
+          <!-- Login Form -->
+          <form action="#" method="POST" class="needs-validation" novalidate>
+            <div class="form-group mb-3">
+              <label for="email" class="form-label" style="font-size: 0.85rem; color: var(--dark);">Email</label>
+              <input type="email" class="form-control" id="email" name="email"  required>
+              <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+            <div class="form-group mb-3">
+              <label for="password" class="form-label" style="font-size: 0.85rem; color: var(--dark);">Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="password" name="password" required>
+                <span class="input-group-text"><i class="bi bi-eye-slash"></i></span>
+              </div>
+              <div class="invalid-feedback">Please enter a password.</div>
+            </div>
+            <div class="form-group mb-3">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="verifyHuman" name="verify_human" required>
+                <label class="form-check-label" for="verifyHuman" style="font-size: 0.85rem;">Verify you are human</label>
+                <div class="invalid-feedback">Please verify you are not a robot.</div>
+              </div>
+              <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Powered by <img src="https://www.cloudflare.com/img/logo-cloudflare-alt.svg" alt="Cloudflare" style="height: 12px; vertical-align: middle;"> Cloudflare</small>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" style="font-size: 0.9rem;">Login</button>
+            <small class="text-muted d-block mt-2" style="font-size: 0.75rem;">By logging in, you agree to our <a href="#" style="color: var(--dark);">Privacy</a> and <a href="#" style="color: var(--dark);">Terms</a>.</small>
+
+            <!-- Don't have an Account? -->
+            <div class="checkbox mb-3 mt-3">
+              <h6 style="font-size: 0.85rem; color: var(--dark);">Don't have an account?</h6>
+              <a class="btn btn-sm btn-secondary" href="{{ url_for('register_page') }}" style="font-size: 0.85rem;">Register</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

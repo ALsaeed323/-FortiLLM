@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}FortiLLM - Run Attack{% endblock %}
+
+{% block content %}
+<section class="run-attack-section" style="min-height: 80vh; display: flex; align-items: center; padding: 2rem 0; background: linear-gradient(135deg, #f9fafb 50%, #e6e9ee 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-5">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <h1 style="color: var(--dark); font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+                        Run Attack
+                    </h1>
+                    <div style="width: 50px; height: 3px; background: var(--primary); margin: 0.5rem auto; border-radius: 2px;"></div>
+                </div>
+
+                <!-- Form with Dropdowns and Submit Button -->
+                <form method="POST" action="" class="attack-form p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                    <div class="form-group mb-3">
+                        <label for="target_app" style="color: var(--dark); font-size: 0.95rem; font-weight: 500; margin-bottom: 0.5rem; display: block;">Target Application</label>
+                        <select class="form-control" id="target_app" name="target_app" style="width: 100%; font-size: 0.9rem; color: var(--dark); padding: 0.75rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; transition: border-color 0.3s ease;">
+                            <option value="EleutherAI/gpt-neo-1.3B">EleutherAI/gpt-neo-1.3B</option>
+                            <option value="OpenAI/gpt-3">OpenAI/gpt-3</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="intention" style="color: var(--dark); font-size: 0.95rem; font-weight: 500; margin-bottom: 0.5rem; display: block;">Intention</label>
+                        <select class="form-control" id="intention" name="intention" style="width: 100%; font-size: 0.9rem; color: var(--dark); padding: 0.75rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; transition: border-color 0.3s ease;">
+                            <option value="Content Manipulation">Content Manipulation</option>
+                            <option value="Prompt Leakage">Prompt Leakage</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(90deg, var(--primary), #b85a4a); color: white; font-size: 1rem; font-weight: 500; padding: 0.75rem 1rem; border: none; border-radius: 0.5rem; transition: transform 0.2s ease, box-shadow 0.3s ease;">
+                        Submit
+                    </button>
+                </form>
+
+                <!-- Results Section -->
+                {% if framework and response %}
+                <div class="results-section mt-5 p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; border-left: 4px solid var(--primary);">
+                    <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Attack Results</h4>
+                    <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Prompt Injected:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: #555;">
+                            - Framework:<br>
+                            - Separator: <br>
+                            - Disruptor: 
+                        </span>
+                    </div>
+                    <div style="font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Response:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: #555;"></span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="results-section mt-5 p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; border-left: 4px solid #e0e0e0;">
+                    <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Attack Results</h4>
+                    <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Prompt Injected:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: #555;">
+                            - Framework: N/A<br>
+                            - Separator: N/A<br>
+                            - Disruptor: N/A
+                        </span>
+                    </div>
+                    <div style="font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Response:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: #555;">No response yet</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .run-attack-section {
+        background: linear-gradient(135deg, #f9fafb 50%, #e6e9ee 100%);
+    }
+    .attack-form {
+        transition: all 0.3s ease;
+    }
+    .attack-form:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .form-control {
+        background-color: #fafafa;
+        border: 1px solid #e0e0e0;
+        transition: border-color 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(202, 110, 87, 0.25);
+        outline: none;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(202, 110, 87, 0.4);
+    }
+    .results-section {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}

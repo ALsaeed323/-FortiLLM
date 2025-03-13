@@ -1,0 +1,288 @@
+:root {
+  --primary: #CA6E57;
+  --dark: #142A43;
+  --light: #5CA5C1;
+  --accent: #4A80A3;
+  --shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+/* Base Styles */
+body {
+  background-color: #ffffff;
+  color: var(--dark);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  scroll-behavior: smooth;
+  margin: 0;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #ffffff;
+  padding: 0.5rem 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+.navbar-brand img:first-child { 
+  height: 32px;
+  transition: var(--transition); 
+}
+.navbar-brand img:last-child { 
+  height: 16px;
+  transition: var(--transition); 
+}
+.navbar-brand:hover img { transform: scale(1.05); }
+.nav-link {
+  color: var(--dark);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+}
+.nav-link:hover, .nav-link:focus { color: var(--primary); }
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #f9fafb 0%, #eef2f6 100%);
+  position: relative;
+  overflow: hidden;
+}
+.hero-logo {
+  width: 100px;
+  margin-bottom: 15px;
+  animation: fadeIn 1s ease-in;
+}
+.hero h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 15px;
+  animation: slideUp 0.8s ease-out;
+}
+.hero p {
+  font-size: 0.95rem;
+  max-width: 600px;
+  margin: 0 auto 20px;
+  color: #555;
+}
+
+/* Features Section */
+.features {
+  padding: 60px 20px;
+  background: #ffffff;
+}
+.features h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 30px;
+}
+.feature-box {
+  background: #ffffff;
+  padding: 25px 15px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  text-align: center;
+}
+.feature-box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+.feature-box i {
+  font-size: 1.75rem;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+.feature-box h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  border: none;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 5px;
+  transition: var(--transition);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background-color: #b85a4a;
+  box-shadow: 0 3px 10px rgba(202, 110, 87, 0.3);
+}
+
+/* Footer */
+.footer {
+  background-color: var(--dark);
+  color: #ffffff;
+  padding: 30px 20px;
+  text-align: center;
+}
+.footer a {
+  color: #ffffff;
+  margin: 0 10px;
+  text-decoration: none;
+  transition: var(--transition);
+}
+.footer a:hover, .footer a:focus { color: var(--primary); }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Typing Animation */
+.typing {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--primary);
+  animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--primary); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero { padding: 40px 15px; }
+  .hero h1 { font-size: 1.75rem; }
+  .hero p { font-size: 0.85rem; }
+  .features { padding: 40px 15px; }
+  .features h2 { font-size: 1.5rem; }
+  .feature-box { padding: 15px 10px; }
+}
+
+/* Register Section */
+.register-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-color: #f9fafb; /* Light background from your theme */
+  padding: 20px 0;
+}
+
+.register-section .form-group label {
+  font-size: 0.85rem;
+  color: var(--dark);
+  font-weight: 500;
+}
+
+.register-section .form-control {
+  border-radius: 0.25rem;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background-color: #fff;
+  transition: var(--transition);
+}
+
+.register-section .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(202, 110, 87, 0.25);
+}
+
+.register-section .input-group-text {
+  background-color: #fff;
+  border-left: 0;
+  border-radius: 0 0.25rem 0.25rem 0;
+  color: var(--dark);
+}
+
+.register-section .btn-primary {
+  background-color: var(--primary);
+  border: none;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  transition: var(--transition);
+}
+
+.register-section .btn-primary:hover, .register-section .btn-primary:focus {
+  background-color: #b85a4a;
+  box-shadow: 0 3px 10px rgba(202, 110, 87, 0.3);
+}
+
+.register-section .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+}
+
+.register-section .btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+.register-section .text-muted a {
+  color: var(--dark);
+  text-decoration: underline;
+}
+
+.register-section .text-muted a:hover {
+  color: var(--primary);
+}
+
+.register-section .checkbox h6 {
+  display: inline-block;
+  margin-right: 1rem;
+  font-size: 0.85rem;
+  color: var(--dark);
+}
+
+.register-section .checkbox .btn-sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .register-section .col-12 {
+    padding: 0 15px;
+  }
+  .register-section .form-control {
+    font-size: 0.85rem;
+  }
+  .register-section .btn-primary {
+    font-size: 0.85rem;
+  }
+}
+/*Specific tweaks for login page */
+.login-section .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.login-section .btn-primary {
+  background-color: var(--primary);
+  border: none;
+}

@@ -1,12 +1,10 @@
-from flask import Flask
-from flask_cors import CORS
-from routes.auth_routes import auth_routes
-from routes.attack_routes import attack_routes
-from routes.results_routes import results_routes
-from routes.fortillm_results_routes import fortillm_results_routes  # <-- Import FortiLLM Results Route
+from flask import Flask, render_template, request, redirect, url_for, flash
+from werkzeug.security import generate_password_hash, check_password_hash
+from pymongo import MongoClient
+import os
 
 app = Flask(__name__)
-CORS(app)
+app.secret_key = os.urllib.parse.quote('your-secret-key')
 
 # Register Blueprints (Routes)
 app.register_blueprint(auth_routes)

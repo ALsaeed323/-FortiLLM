@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="FortiLLM - Protect your LLM applications from prompt injection attacks with advanced security solutions.">
+    <meta name="keywords" content="AI security, prompt injection, LLM protection, FortiLLM, LLM applications">
+    <!-- Open Graph Tags for Social Sharing -->
+    <meta property="og:title" content="FortiLLM - Fortifying LLMs Against Prompt Injections">
+    <meta property="og:description" content="Protect your LLM applications with FortiLLM. Built for enterprises, researchers, and developers.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo.png') }}">
+    <title>
+      {% block title %}
+      {% endblock %}
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- Custom Font: Inter -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" as="style" onload="this.rel='stylesheet'">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  </head>
+  <body>
+    <!-- Navigation -->
+    <header>
+      <nav class="navbar navbar-expand-lg" aria-label="Main navigation">
+        <div class="container">
+          <a class="navbar-brand" href="{{ url_for('home_page') }}" aria-label="FortiLLM Home">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FortiLLM Logo">
+            <img src="{{ url_for('static', filename='images/logo_name2.png') }}" alt="FortiLLM Name">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('login_page') }}">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link btn btn-primary text-white" href="{{ url_for('register_page') }}">Register</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      {% block content %}
+      {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+      <div class="container">
+        <p>© 2025 FortiLLM. All rights reserved.</p>
+        <nav aria-label="Footer navigation">
+          <a href="#">Privacy Policy</a> |
+          <a href="#">Terms of Service</a> |
+          <a href="#">Contact Us</a>
+        </nav>
+        <div class="mt-3">
+          <a href="#" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
+          <a href="#" aria-label="GitHub"><i class="bi bi-github"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+  </body>
+</html>
