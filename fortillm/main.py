@@ -11,6 +11,7 @@ from intention.prompt_leakage import PromptLeakage
 from iterative_prompt_optimization import IterativePromptOptimizer
 from intention.jail_break_override import JailbreakOverride
 from intention.content_manipulation import ContentManipulation
+from intention.token_smuggling import TokenSmuggling
 
 logger = loguru.logger
 
@@ -57,7 +58,7 @@ def send_results_to_backend(chromosome):
 
 def main():
     # Initialize prompt injection intention and harness
-    intention = ContentManipulation()
+    intention = JailbreakOverride()
     application_harness = TranslatorHarness()
 
     # Begin the prompt injection process
@@ -85,3 +86,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+ 
