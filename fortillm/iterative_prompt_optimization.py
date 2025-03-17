@@ -59,7 +59,31 @@ class IterativePromptOptimizer:
             self.separator_list = []
             self.disruptor_list = []
 
+    def fitness_ranking(self, population: List[Chromosome]):
+        """Evaluates and ranks the population based on fitness scores."""
+        with ThreadPoolExecutor(max_workers=self.max_concurrent_thread) as executor:
+            logger.info("Calculating fitness scores for each chromosome...")
+            fitness_scores = list(executor.map(llm_fitness_ranking, population))
+
+        for idx, score in enumerate(fitness_scores):
+            population[idx].fitness_score = score
+
+        # Use heapq to efficiently find the top chromosomes
+        population = heapq.nlargest(self.max_population, population, key=lambda x: x.fitness_score)
+        update_malicious_memory(population[0].question_prompt)
+
+        # Log the best chromosome details
+        best_chromosome = population[0]
+        logger.info(f"Best Chromosome Framework: {best_chromosome.framework}")
+        logger.info(f"Best Chromosome Separator: {best_chromosome.separator}")
+        logger.info(f"Best Chromosome Disruptor: {best_chromosome.disruptor}")
+        logger.info(f"Best Chromosome Response: {best_chromosome.llm_response}")
+        logger.info(f"Best Chromosome Fitness Score: {best_chromosome.fitness_score}")
+
+        return population
+
     def optimize(self):
+        """Executes the iterative optimization process."""
         logger.info("Starting optimization process...")
 
         # Generate framework, separator, and disruptor prompts
@@ -70,7 +94,7 @@ class IterativePromptOptimizer:
         separator_list = [sep().generate_separator() for sep in self.separator_list]  
         disruptor_list = [dis().generate_disruptor() + self.intention.question_prompt for dis in self.disruptor_list] 
 
-        # Generate initial population efficiently
+        # Generate initial population
         population: List[Chromosome] = [
             Chromosome(disruptor, separator, framework, self.intention.question_prompt)
             for framework, separator, disruptor in product(framework_prompt_list, separator_list, disruptor_list)
@@ -93,7 +117,6 @@ class IterativePromptOptimizer:
 
             # Rank chromosomes by fitness
             population = self.fitness_ranking(population)
-            self.fitness_shield_llm(population)
             self.best_chromosome = population[0]
             logger.info(f"Best chromosome fitness score: {self.best_chromosome.fitness_score}")
 
