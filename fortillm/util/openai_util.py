@@ -1,9 +1,15 @@
-from transformers import pipeline
+import ollama
 
-# Initialize the Hugging Face pipeline for text generation
-generator = pipeline("text-generation", model="EleutherAI/gpt-neo-1.3B")
-
-def completion_with_chatgpt(text: str, model: str = "EleutherAI/gpt-neo-1.3B") -> str:
-    # Generate a response using the Hugging Face model
-    response = generator(text, max_new_tokens=100, num_return_sequences=1, truncation=True)
-    return response[0]["generated_text"]
+def completion_with_chatgpt(text: str, model: str = "deepseek-r1:latest") -> str:
+    """
+    Generate a response using an Ollama DeepSeek model.
+    
+    Parameters:
+        text (str): The input prompt.
+        model (str): The Ollama model to use (default: "deepseek-r1:latest").
+    
+    Returns:
+        str: The generated response.
+    """
+    response = ollama.chat(model=model, messages=[{"role": "user", "content": text}])
+    return response["message"]["content"]

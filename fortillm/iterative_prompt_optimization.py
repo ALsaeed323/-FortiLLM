@@ -1,21 +1,32 @@
 import random
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
-
-import loguru
+import heapq
+from itertools import product
 
 from constant.chromosome import Chromosome
 from constant.prompt_injection import PromptInjection
 from harness.base_harness import Harness
 from intention.base_intention import Intention
-from strategy.disruptor_generation import DISRUPTOR_GENERATOR_LIST
+from intention.jail_break_override import JailbreakOverride
+from intention.token_smuggling import TokenSmuggling  
+from strategy.disruptor_generation import (
+    Jailbreak_DISRUPTOR_GENERATOR_LIST,
+    Token_smuggling_DISRUPTOR_GENERATOR_LIST
+)
+from strategy.separator_generation import (
+    Jailbreak_SEPARATOR_GENERATOR_LIST,
+    Token_smuggling_SEPARATOR_GENERATOR_LIST
+)
 from strategy.framework_generation import FRAMEWORK_GENERATION_STRATEGY
-from strategy.separator_generation import SEPARATOR_GENERATOR_LIST
 from util.fitness_ranking import llm_fitness_ranking
 from util.mutation import llm_mutation_generation
+from util.shield import update_malicious_memory, shield_llm
 
-logger = loguru.logger
-
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 class IterativePromptOptimizer:
     def __init__(
@@ -37,171 +48,82 @@ class IterativePromptOptimizer:
         self.max_concurrent_thread: int = 10
         self.best_chromosome: Chromosome = None
 
+        # Use only the separators and disruptors related to the chosen intention
+        if isinstance(self.intention, JailbreakOverride):
+            self.separator_list = Jailbreak_SEPARATOR_GENERATOR_LIST
+            self.disruptor_list = Jailbreak_DISRUPTOR_GENERATOR_LIST
+        elif isinstance(self.intention, TokenSmuggling):
+            self.separator_list = Token_smuggling_SEPARATOR_GENERATOR_LIST
+            self.disruptor_list = Token_smuggling_DISRUPTOR_GENERATOR_LIST
+        else:
+            self.separator_list = []
+            self.disruptor_list = []
+
     def fitness_ranking(self, population: List[Chromosome]):
-        # Calculate fitness score for each chromosome concurrently
+        """Evaluates and ranks the population based on fitness scores."""
         with ThreadPoolExecutor(max_workers=self.max_concurrent_thread) as executor:
-            logger.info("Start to calculate fitness score for each chromosome")
-            fitness_score = executor.map(llm_fitness_ranking, population)
-            # Assign fitness score to each chromosome
-            for idx, score in enumerate(fitness_score):
-                population[idx].fitness_score = score
+            logger.info("Calculating fitness scores for each chromosome...")
+            fitness_scores = list(executor.map(llm_fitness_ranking, population))
 
-            # Sort and retain top chromosomes by fitness score
-            population.sort(key=lambda x: x.fitness_score, reverse=True)
-            population = population[: self.max_population]
-            # Log the best chromosome details
-            best_chromosome = population[0]
-            logger.info(f"Best Chromosome Framework: {best_chromosome.framework}")
-            logger.info(f"Best Chromosome Separator: {best_chromosome.separator}")
-            logger.info(f"Best Chromosome Disruptor: {best_chromosome.disruptor}")
-            logger.info(f"Best Chromosome Response: {best_chromosome.llm_response}")
-            logger.info(
-                f"Best Chromosome Fitness Score: {best_chromosome.fitness_score}"
-            )
-            return population
+        for idx, score in enumerate(fitness_scores):
+            population[idx].fitness_score = score
 
-    def single_framework_prompt_generator(self, framework_generation_strategy) -> str:
-        # Generate a single framework prompt using the given strategy
-        framework_generation_generator = framework_generation_strategy()
-        framework = framework_generation_generator.generate_framework(
-            self.application_harness.application_document
-        )
-        return framework
+        # Use heapq to efficiently find the top chromosomes
+        population = heapq.nlargest(self.max_population, population, key=lambda x: x.fitness_score)
+        update_malicious_memory(population[0].question_prompt)
 
-    def framework_prompt_generation(self) -> List[str]:
-        # Generate multiple framework prompts concurrently
-        logger.info("Start to generate framework")
-        with ThreadPoolExecutor(max_workers=self.max_concurrent_thread) as executor:
-            framework_list = executor.map(
-                self.single_framework_prompt_generator, FRAMEWORK_GENERATION_STRATEGY
-            )
-            logger.info("Finish generating framework")
-            return list(framework_list)
+        # Log the best chromosome details
+        best_chromosome = population[0]
+        logger.info(f"Best Chromosome Framework: {best_chromosome.framework}")
+        logger.info(f"Best Chromosome Separator: {best_chromosome.separator}")
+        logger.info(f"Best Chromosome Disruptor: {best_chromosome.disruptor}")
+        logger.info(f"Best Chromosome Response: {best_chromosome.llm_response}")
+        logger.info(f"Best Chromosome Fitness Score: {best_chromosome.fitness_score}")
 
-    def combine_chromosome(
-        self, chromosome1: Chromosome, chromosome2: Chromosome
-    ) -> Chromosome:
-        logger.info(f"Chromosome 1: {chromosome1}")
-        logger.info(f"Chromosome 2: {chromosome2}")
-        # Combine two chromosomes to create a new one by randomly selecting attributes
-        disruptor = (
-            chromosome1.disruptor
-            if random.choice([True, False])
-            else chromosome2.disruptor
-        )
-        separator = (
-            chromosome1.separator
-            if random.choice([True, False])
-            else chromosome2.separator
-        )
-        framework = (
-            chromosome1.framework
-            if random.choice([True, False])
-            else chromosome2.framework
-        )
-        question_prompt = (
-            chromosome1.question_prompt
-            if random.choice([True, False])
-            else chromosome2.question_prompt
-        )
-        logger.info(f"New Chromosome: Disruptor={disruptor}, Separator={separator}, Framework={framework}, Question Prompt={question_prompt}")
-        return Chromosome(disruptor, separator, framework, question_prompt)
-
-    def single_mutation_chromosome(self, chromosome: Chromosome) -> Chromosome:
-        # Perform mutation on a single chromosome
-        logger.info(f"Before Mutation: Disruptor={chromosome.disruptor}, Separator={chromosome.separator}, Framework={chromosome.framework}, Question Prompt={chromosome.question_prompt}")
-
-        llm_mutation_generation(chromosome)
-        logger.info(f"After Mutation: Disruptor={chromosome.disruptor}, Separator={chromosome.separator}, Framework={chromosome.framework}, Question Prompt={chromosome.question_prompt}")
-
-    def mutation_chromosome(self, population: List[Chromosome]) -> List[Chromosome]:
-        # Mutate the chromosomes in the population concurrently
-        with ThreadPoolExecutor(max_workers=self.max_concurrent_thread) as executor:
-            logger.info("Start to mutate chromosome")
-            mutated_population = executor.map(
-                self.single_mutation_chromosome, population
-            )
-            logger.info("Finish mutating chromosome")
-            return list(mutated_population)
-
-    def attack_application(self, population: List[Chromosome]):
-        # Perform application attacks concurrently using the chromosomes
-        with ThreadPoolExecutor(max_workers=self.max_concurrent_thread) as executor:
-            logger.info("Start to attack application")
-            prompt_injection_list = []
-            for chromosome in population:
-                prompt_injection = PromptInjection(intention=self.intention)
-                prompt_injection.prompt = f"{chromosome.framework}{chromosome.separator}{chromosome.disruptor}"
-                prompt_injection_list.append(prompt_injection)
-
-            response_list = executor.map(
-                self.application_harness.run_harness, prompt_injection_list
-            )
-            for idx, response in enumerate(response_list):
-                population[idx].llm_response = response
-
-            logger.info("Finish attacking application")
+        return population
 
     def optimize(self):
-        # Generate initial prompts
-        framework_prompt_list = self.framework_prompt_generation()
-        separator_list = [
-            separator_generator().generate_separator()
-            for separator_generator in SEPARATOR_GENERATOR_LIST
-        ]
-        disruptor_list = [
-            disruptor_generator().generate_disruptor() + self.intention.question_prompt
-            for disruptor_generator in DISRUPTOR_GENERATOR_LIST
-        ]
+        """Executes the iterative optimization process."""
+        logger.info("Starting optimization process...")
 
-        # Build initial population
-        population: List[Chromosome] = []
-        for framework in framework_prompt_list:
-            for separator in separator_list:
-                for disruptor in disruptor_list:
-                    initial_chromosome = Chromosome(
-                        disruptor, separator, framework, self.intention.question_prompt
-                    )
-                    population.append(initial_chromosome)
+        # Generate framework, separator, and disruptor prompts
+        framework_prompt_list = [
+            strategy().generate_framework(self.application_harness.application_document)
+            for strategy in FRAMEWORK_GENERATION_STRATEGY
+        ]
+        separator_list = [sep().generate_separator() for sep in self.separator_list]  
+        disruptor_list = [dis().generate_disruptor() + self.intention.question_prompt for dis in self.disruptor_list] 
 
-        # Begin optimization iterations
+        # Generate initial population
+        population: List[Chromosome] = [
+            Chromosome(disruptor, separator, framework, self.intention.question_prompt)
+            for framework, separator, disruptor in product(framework_prompt_list, separator_list, disruptor_list)
+        ]
+        logger.info(f"Initial population size: {len(population)}")
+
+        # Optimization loop
         for iteration_num in range(self.iteration):
-            logger.info(f"Start iteration: {iteration_num}")
-            logger.info("Start to crossover")
+            logger.info(f"--- Iteration {iteration_num + 1} ---")
 
-            if iteration_num > 0:
-                # Perform crossover to generate new chromosomes
-                for _ in range(self.max_crossover):
-                    idx1, idx2 = random.sample(range(len(population)), 2)
-                    chromosome1 = population[idx1]
-                    chromosome2 = population[idx2]
-                    logger.info(f"Perform crossover on chromosome {chromosome1} and {chromosome2}")
-                    new_chromosome1 = self.combine_chromosome(chromosome1, chromosome2)
-                    new_chromosome2 = self.combine_chromosome(chromosome1, chromosome2)
-                    logger.info(f"New chromosome 1: {new_chromosome1}")
-                    logger.info(f"New chromosome 2: {new_chromosome2}")
-                    population.append(new_chromosome1)
-                    population.append(new_chromosome2)
-                logger.info("Finish crossover")
+            # Attack the application
+            with ThreadPoolExecutor(max_workers=self.max_concurrent_thread) as executor:
+                response_list = executor.map(
+                    self.application_harness.run_harness, 
+                    [PromptInjection(self.intention, f"{c.framework}{c.separator}{c.disruptor}") for c in population]
+                )
 
-                # Perform mutation on selected chromosomes
-                candidate_mutation_chromosome_list: List[Chromosome] = [
-                    chromosome
-                    for chromosome in population
-                    if random.random() < self.mutation
-                ]
-                self.mutation_chromosome(candidate_mutation_chromosome_list)
-
-            # Attack the application using the current population
-            self.attack_application(population)
+                for idx, response in enumerate(response_list):
+                    population[idx].llm_response = response
 
             # Rank chromosomes by fitness
             population = self.fitness_ranking(population)
-
-            # Update the best chromosome
             self.best_chromosome = population[0]
-            # Check if the best chromosome meets the success criteria
+            logger.info(f"Best chromosome fitness score: {self.best_chromosome.fitness_score}")
+
+            # Check if optimization is successful
             if population[0].fitness_score >= self.success_score_threshold:
-                logger.info("Success! Injected prompt")
+                logger.info("Success! Optimal prompt found.")
                 population[0].is_successful = True
                 break
+
+        logger.info("Optimization process finished.")
