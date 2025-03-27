@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}FortiLLM - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-dashboard-section" style="min-height: 80vh; padding: 2rem 0; background: linear-gradient(135deg, #f9fafb 50%, #e6e9ee 100%);">
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 style="color: var(--dark); font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
+                Admin Dashboard
+            </h1>
+            <div style="width: 50px; height: 3px; background: var(--primary); margin: 0.5rem auto; border-radius: 2px;"></div>
+        </div>
+
+        <!-- Overview Cards -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="overview-card p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                    <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">Total Users</h4>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0;">125</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="overview-card p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                    <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">Total Attacks Run</h4>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0;">342</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="overview-card p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                    <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">Active Users (Last 24h)</h4>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0;">78</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Insights Table -->
+        <div class="user-insights-section mb-5">
+            <h2 style="color: var(--dark); font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">User Insights</h2>
+            <div class="table-responsive">
+                <table class="table" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <thead style="background: linear-gradient(90deg, var(--primary), #b85a4a); color: white;">
+                        <tr>
+                            <th style="padding: 1rem; font-weight: 500;">User ID</th>
+                            <th style="padding: 1rem; font-weight: 500;">Username</th>
+                            <th style="padding: 1rem; font-weight: 500;">Email</th>
+                            <th style="padding: 1rem; font-weight: 500;">Attacks Run</th>
+                            <th style="padding: 1rem; font-weight: 500;">Last Active</th>
+                            <th style="padding: 1rem; font-weight: 500;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 1rem; color: #555;">001</td>
+                            <td style="padding: 1rem; color: #555;">john_doe</td>
+                            <td style="padding: 1rem; color: #555;">john.doe@example.com</td>
+                            <td style="padding: 1rem; color: #555;">15</td>
+                            <td style="padding: 1rem; color: #555;">2025-03-27 10:30 AM</td>
+                            <td style="padding: 1rem;">
+                                <button class="btn btn-sm btn-primary" style="background: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">View Attacks</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; color: #555;">002</td>
+                            <td style="padding: 1rem; color: #555;">jane_smith</td>
+                            <td style="padding: 1rem; color: #555;">jane.smith@example.com</td>
+                            <td style="padding: 1rem; color: #555;">8</td>
+                            <td style="padding: 1rem; color: #555;">2025-03-26 03:15 PM</td>
+                            <td style="padding: 1rem;">
+                                <button class="btn btn-sm btn-primary" style="background: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 0.5rem;">View Attacks</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Attack History Section -->
+        <div class="attack-history-section">
+            <h2 style="color: var(--dark); font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Recent Attack History</h2>
+            <div class="table-responsive">
+                <table class="table" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <thead style="background: linear-gradient(90deg, var(--primary), #b85a4a); color: white;">
+                        <tr>
+                            <th style="padding: 1rem; font-weight: 500;">Attack ID</th>
+                            <th style="padding: 1rem; font-weight: 500;">User</th>
+                            <th style="padding: 1rem; font-weight: 500;">Target App</th>
+                            <th style="padding: 1rem; font-weight: 500;">Intention</th>
+                            <th style="padding: 1rem; font-weight: 500;">Date</th>
+                            <th style="padding: 1rem; font-weight: 500;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 1rem; color: #555;">ATK-001</td>
+                            <td style="padding: 1rem; color: #555;">john_doe</td>
+                            <td style="padding: 1rem; color: #555;">EleutherAI/gpt-neo-1.3B</td>
+                            <td style="padding: 1rem; color: #555;">Content Manipulation</td>
+                            <td style="padding: 1rem; color: #555;">2025-03-27</td>
+                            <td style="padding: 1rem; color: #28a745;">Success</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem; color: #555;">ATK-002</td>
+                            <td style="padding: 1rem; color: #555;">jane_smith</td>
+                            <td style="padding: 1rem; color: #555;">OpenAI/gpt-3</td>
+                            <td style="padding: 1rem; color: #555;">Prompt Leakage</td>
+                            <td style="padding: 1rem; color: #555;">2025-03-26</td>
+                            <td style="padding: 1rem; color: #dc3545;">Failed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .admin-dashboard-section {
+        background: linear-gradient(135deg, #f9fafb 50%, #e6e9ee 100%);
+    }
+    .overview-card {
+        transition: all 0.3s ease;
+    }
+    .overview-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(202, 110, 87, 0.4);
+    }
+</style>
+{% endblock %}

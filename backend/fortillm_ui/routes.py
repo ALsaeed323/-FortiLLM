@@ -22,3 +22,7 @@ def login_page():
 @app.route('/run_attack')
 def run_attack_page():
     return render_template('attack.html')
+
+@app.route('/dashboard')
+def dashboard_page():
+    return render_template('dashboard.html')
