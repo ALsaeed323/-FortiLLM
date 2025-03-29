@@ -11,14 +11,19 @@
 
           <!-- Logo -->
           <div class="text-center mb-4">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Grok Logo" class="img-fluid" style="max-width: 100px;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FortiLLM Logo" class="img-fluid" style="max-width: 100px;">
           </div>
 
           <!-- Login Form -->
-          <form action="#" method="POST" class="needs-validation" novalidate>
+          <form action="{{ url_for('login_controller') }}" method="POST" class="needs-validation" novalidate>
+            {% if error %}
+              <div class="alert alert-danger" role="alert">
+                {{ error }}
+              </div>
+            {% endif %}
             <div class="form-group mb-3">
               <label for="email" class="form-label" style="font-size: 0.85rem; color: var(--dark);">Email</label>
-              <input type="email" class="form-control" id="email" name="email"  required>
+              <input type="email" class="form-control" id="email" name="email" required>
               <div class="invalid-feedback">Please enter a valid email address.</div>
             </div>
             <div class="form-group mb-3">
@@ -50,4 +55,21 @@
       </div>
     </div>
   </section>
+
+  <!-- Bootstrap JS for form validation (optional) -->
+  <script>
+    (function () {
+      'use strict';
+      var forms = document.querySelectorAll('.needs-validation');
+      Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
 {% endblock %}

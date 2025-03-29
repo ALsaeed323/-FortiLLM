@@ -14,4 +14,4 @@ app = Flask(__name__)
 # login_manager.login_view = "login_page"
 # login_manager.login_message_category = "info"
 
-from routes import routes
+from backend.routes import routes

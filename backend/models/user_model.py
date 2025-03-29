@@ -5,7 +5,7 @@ users_collection = db["users"]
 
 def create_user(name, email, password):
     hashed_password = generate_password_hash(password, method="pbkdf2:sha256")
-    users_collection.insert_one({"name":name,"email": email, "password": hashed_password})
+    users_collection.insert_one({"name": name, "email": email, "password": hashed_password})
     return True
 
 def find_user_by_email(email):
