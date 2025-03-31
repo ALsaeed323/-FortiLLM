@@ -9,6 +9,11 @@
             <h1 style="color: var(--dark); font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
                 Admin Dashboard
             </h1>
+            {% if full_name %}
+                <p style="color: var(--dark); font-size: 1.2rem; margin-top: 0.5rem;">
+                    Welcome, {{ full_name }}!
+                </p>
+            {% endif %}
             <div style="width: 50px; height: 3px; background: var(--primary); margin: 0.5rem auto; border-radius: 2px;"></div>
         </div>
 

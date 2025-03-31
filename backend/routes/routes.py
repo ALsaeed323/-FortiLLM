@@ -28,9 +28,11 @@ def run_attack_page():
 def dashboard_page():
     if "email" not in session:
         return redirect(url_for("login_page"))
-    
-    full_name = session.get("name")
+
+    full_name = session.get("full_name")  # Corrected here
+    print(f"Debug: Full name from session: {full_name}")
     return render_template('dashboard.html', full_name=full_name)
 
 app.route("/register", methods=["POST"])(register_controller)
 app.route("/login", methods=["POST"])(login_controller)
+app.route('/logout', methods=['GET'])(logout_controller)
