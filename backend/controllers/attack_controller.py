@@ -1,9 +1,9 @@
 import subprocess
 import os
-from flask import jsonify, request
 import jwt
 from functools import wraps
 from models.attack_model import store_attack_result
+from flask import jsonify, request, render_template
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -23,26 +23,21 @@ def token_required(f):
 def run_attack_controller():
     """Handles running an attack and storing the result."""
     try:
-        data = request.get_json()
-        attack_type = data.get("attack_type", "injection")
-        target = data.get("target", "LLM_API")
+        attack_type = request.form.get("intention", "injection")
+        target = request.form.get("target_app", "LLM_API")
+        print(f"Debug: Attack Type: {attack_type}, Target: {target}")
 
-        # Define the FortiLLM Path
         FORTILLM_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../fortillm/main.py"))
-
-        # Run FortiLLM Attack using subprocess
+        print(f"Debug: FORTILLM_PATH: {FORTILLM_PATH}")
         result = subprocess.run(
-            ["python", FORTILLM_PATH],
-            capture_output=True, text=True
+            ["python", FORTILLM_PATH]
         )
 
         output = result.stdout.strip()
         error = result.stderr.strip()
 
-        # Store attack results
-        #store_attack_result(attack_type, target, output, error)
-
-        return jsonify({"output": output, "error": error})
-    
+        return render_template('attack.html',
+                             framework=target,
+                             response=output if output else error)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return render_template('attack.html', error=str(e))

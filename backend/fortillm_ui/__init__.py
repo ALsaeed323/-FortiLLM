@@ -20,7 +20,7 @@ if not SECRET_KEY:
 app.secret_key = SECRET_KEY
 
 # Debug output to verify secret key
-print(f"Debug: Secret Key set to: {app.secret_key}")
+# print(f"Debug: Secret Key set to: {app.secret_key}")
 
 # MongoDB configuration
 # app.config['MONGO_URI'] = os.getenv("MONGO_URI", "mongodb://localhost:27017/market_db")

@@ -1,6 +1,7 @@
 from fortillm_ui import app
 from flask import render_template,session, redirect, url_for
 from controllers.auth_controller import register_controller, login_controller, logout_controller
+from controllers.attack_controller import run_attack_controller
 # , redirect, url_for, flash, request
 # from fortillm_ui.models import Item, User
 # from fortillm_ui.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
@@ -20,8 +21,10 @@ def register_page():
 def login_page():
     return render_template('login.html')
 
-@app.route('/run_attack')
+@app.route('/run-attack', methods=['GET'])
 def run_attack_page():
+    if "email" not in session:
+        return redirect(url_for("login_page"))
     return render_template('attack.html')
 
 @app.route('/dashboard')
@@ -35,4 +38,5 @@ def dashboard_page():
 
 app.route("/register", methods=["POST"])(register_controller)
 app.route("/login", methods=["POST"])(login_controller)
+app.route("/run-attack", methods=["POST"])(run_attack_controller)
 app.route('/logout', methods=['GET'])(logout_controller)
