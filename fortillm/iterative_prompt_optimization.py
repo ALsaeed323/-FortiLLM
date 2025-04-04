@@ -10,15 +10,14 @@ from constant.prompt_injection import PromptInjection
 from harness.base_harness import Harness
 from intention.base_intention import Intention
 from intention.jail_break_override import JailbreakOverride
+from intention.content_manipulation import ContentManipulation
 from intention.token_smuggling import TokenSmuggling  
 from strategy.disruptor_generation import (
     Jailbreak_DISRUPTOR_GENERATOR_LIST,
+    ContentManipulation_DISRUPTOR_GENERATOR_LIST,
     Token_smuggling_DISRUPTOR_GENERATOR_LIST
 )
-from strategy.separator_generation import (
-    Jailbreak_SEPARATOR_GENERATOR_LIST,
-    Token_smuggling_SEPARATOR_GENERATOR_LIST
-)
+from strategy.separator_generation import SEPARATOR_GENERATOR_LIST
 from strategy.framework_generation import FRAMEWORK_GENERATION_STRATEGY
 from util.fitness_ranking import llm_fitness_ranking
 from util.mutation import llm_mutation_generation
@@ -49,14 +48,15 @@ class IterativePromptOptimizer:
         self.best_chromosome: Chromosome = None
 
         # Use only the separators and disruptors related to the chosen intention
+        self.separator_list = SEPARATOR_GENERATOR_LIST
+
         if isinstance(self.intention, JailbreakOverride):
-            self.separator_list = Jailbreak_SEPARATOR_GENERATOR_LIST
             self.disruptor_list = Jailbreak_DISRUPTOR_GENERATOR_LIST
+        elif isinstance(self.intention, ContentManipulation):
+            self.disruptor_list = ContentManipulation_DISRUPTOR_GENERATOR_LIST
         elif isinstance(self.intention, TokenSmuggling):
-            self.separator_list = Token_smuggling_SEPARATOR_GENERATOR_LIST
             self.disruptor_list = Token_smuggling_DISRUPTOR_GENERATOR_LIST
         else:
-            self.separator_list = []
             self.disruptor_list = []
 
     def fitness_ranking(self, population: List[Chromosome]):
