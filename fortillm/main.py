@@ -22,7 +22,7 @@ max_mutation = 0.5
 max_population = 10
 
 # Backend API URL (Update if running on a different server)
-BACKEND_URL = "http://127.0.0.1:5000/api/fortillm_results"
+BACKEND_URL = "http://127.0.0.1:5000/fortillm_results"
 
 def inject(intention: Intention, application_harness: Harness) -> Chromosome:
     iterative_prompt_optimizer = IterativePromptOptimizer(

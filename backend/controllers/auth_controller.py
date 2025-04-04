@@ -1,5 +1,9 @@
-from flask import request, render_template, redirect, url_for, jsonify, session
+from flask import request, render_template, redirect, url_for, jsonify, session,make_response
 from models.user_model import create_user, find_user_by_email, verify_password
+import jwt
+import datetime
+import os
+
 
 def register_controller():
     try:
@@ -30,6 +34,9 @@ def register_controller():
         print(f"Error in register_controller: {str(e)}")
         return jsonify({"error": "An unexpected error occurred during registration"}), 500
 
+
+SECRET_KEY = os.getenv("SECRET_KEY")  # Make sure this is set in your environment
+
 def login_controller():
     try:
         email = request.form.get("email")
@@ -45,14 +52,25 @@ def login_controller():
         if not user or not verify_password(user["password"], password):
             return render_template("login.html", error="Invalid credentials")
 
+        # Save session
         session["full_name"] = user["name"]
         session["email"] = user["email"]
-        return redirect(url_for("dashboard_page"))
+
+        # Generate token
+        token = jwt.encode({
+            "email": user["email"],
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+        }, SECRET_KEY, algorithm="HS256")
+
+        # Set token in secure HttpOnly cookie
+        response = make_response(redirect(url_for("dashboard_page")))
+        response.set_cookie("auth_token", token, httponly=True, secure=True, samesite='Lax')
+
+        return response
 
     except Exception as e:
         print(f"Error in login_controller: {str(e)}")
         return render_template("login.html", error="An unexpected error occurred. Please try again."), 500
-
 def logout_controller():
     try:
         session.clear()

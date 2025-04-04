@@ -10,15 +10,29 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.headers.get("Authorization")
+        token = None
+
+        # Try getting token from headers or cookies
+        if "Authorization" in request.headers:
+            auth_header = request.headers.get("Authorization", "")
+            if auth_header.startswith("Bearer "):
+                token = auth_header.split("Bearer ")[1]
+        elif "auth_token" in request.cookies:
+            token = request.cookies.get("auth_token")
+
         if not token:
             return jsonify({"error": "Token is missing!"}), 401
+
         try:
-            jwt.decode(token.split("Bearer ")[1], SECRET_KEY, algorithms=["HS256"])
-        except:
+            jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token has expired!"}), 401
+        except jwt.InvalidTokenError:
             return jsonify({"error": "Invalid token!"}), 401
+
         return f(*args, **kwargs)
     return decorated
+
 
 def run_attack_controller():
     """Handles running an attack and storing the result."""

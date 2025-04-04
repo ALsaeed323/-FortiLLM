@@ -13,14 +13,13 @@
                     </h1>
                     <div style="width: 50px; height: 3px; background: var(--primary); margin: 0.5rem auto; border-radius: 2px;"></div>
                 </div>
-                <!---->
 
-                <!-- Form with Dropdowns and Submit Button -->
-                <form method="POST" action="" class="attack-form p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                <!-- Form -->
+                <form method="POST" action="{{ url_for('run_attack_controller') }}" class="attack-form p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.3s ease;">
                     <div class="form-group mb-3">
                         <label for="target_app" style="color: var(--dark); font-size: 0.95rem; font-weight: 500; margin-bottom: 0.5rem; display: block;">Target Application</label>
                         <select class="form-control" id="target_app" name="target_app" style="width: 100%; font-size: 0.9rem; color: var(--dark); padding: 0.75rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; transition: border-color 0.3s ease;">
-                            <option value="EleutherAI/gpt-neo-1.3B">EleutherAI/gpt-neo-1.3B</option>
+                            <option value="DeepSeek-R1 model">DeepSeek-R1 model</option>
                             <option value="OpenAI/gpt-3">OpenAI/gpt-3</option>
                         </select>
                     </div>
@@ -28,6 +27,7 @@
                     <div class="form-group mb-4">
                         <label for="intention" style="color: var(--dark); font-size: 0.95rem; font-weight: 500; margin-bottom: 0.5rem; display: block;">Intention</label>
                         <select class="form-control" id="intention" name="intention" style="width: 100%; font-size: 0.9rem; color: var(--dark); padding: 0.75rem; border: 1px solid #e0e0e0; border-radius: 0.5rem; transition: border-color 0.3s ease;">
+                            <option value="Jailbreak Override">Jailbreak Override</option>
                             <option value="Content Manipulation">Content Manipulation</option>
                             <option value="Prompt Leakage">Prompt Leakage</option>
                         </select>
@@ -39,23 +39,41 @@
                 </form>
 
                 <!-- Results Section -->
-                {% if framework and response %}
-                <div class="results-section mt-5 p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; border-left: 4px solid var(--primary);">
-                    <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Attack Results</h4>
+                {% if results %}
+                {% for result in results %}
+                <div class="results-section mt-5 p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; border-left: 4px solid {{ '#28a745' if result.is_successful else '#dc3545' }};">
+                    <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Attack Result {{ loop.index }}</h4>
                     <div style="margin-bottom: 1rem; font-size: 0.9rem;">
                         <strong style="color: var(--dark); font-weight: 500;">Prompt Injected:</strong><br>
                         <span style="display: block; margin-left: 1rem; color: #555;">
-                            - Framework:<br>
-                            - Separator: <br>
-                            - Disruptor: 
+                            - Framework: {{ result.framework|default('N/A') }}<br>
+                            - Separator: {{ result.separator|default('N/A') }}<br>
+                            - Disruptor: {{ result.disruptor|default('N/A') }}
                         </span>
                     </div>
-                    <div style="font-size: 0.9rem;">
-                        <strong style="color: var(--dark); font-weight: 500;">Response:</strong><br>
-                        <span style="display: block; margin-left: 1rem; color: #555;"></span>
+                    <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Fitness Score:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: #555;">{{ result.fitness_score|default(0.0) }}</span>
                     </div>
+                    <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Response:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: #555;">{{ result.response|default('N/A') }}</span>
+                    </div>
+                    <div style="font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Status:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: {{ '#28a745' if result.is_successful else '#dc3545' }};">
+                            {{ 'Success' if result.is_successful else 'Failed' }}
+                        </span>
+                    </div>
+                    {% if result.error %}
+                    <div style="font-size: 0.9rem; color: #dc3545;">
+                        <strong style="color: var(--dark); font-weight: 500;">Error:</strong><br>
+                        <span style="display: block; margin-left: 1rem;">{{ result.error }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% else %}
+                {% endfor %}
+            {% else %}
                 <div class="results-section mt-5 p-4" style="background-color: #fff; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; border-left: 4px solid #e0e0e0;">
                     <h4 style="color: var(--dark); font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">Attack Results</h4>
                     <div style="margin-bottom: 1rem; font-size: 0.9rem;">
@@ -66,12 +84,17 @@
                             - Disruptor: N/A
                         </span>
                     </div>
+                    <div style="margin-bottom: 1rem; font-size: 0.9rem;">
+                        <strong style="color: var(--dark); font-weight: 500;">Fitness Score:</strong><br>
+                        <span style="display: block; margin-left: 1rem; color: #555;">0.0</span>
+                    </div>
                     <div style="font-size: 0.9rem;">
                         <strong style="color: var(--dark); font-weight: 500;">Response:</strong><br>
                         <span style="display: block; margin-left: 1rem; color: #555;">No response yet</span>
                     </div>
                 </div>
-                {% endif %}
+            {% endif %}
+            
             </div>
         </div>
     </div>
