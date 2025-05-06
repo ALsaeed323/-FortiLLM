@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+{% block title %}FortiLLM - Attack Executions{% endblock %}
+
+{% block content %}
+<div style="display: flex;" id="page-content" class="hidden">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <br>
+        <br>
+        <ul>
+            <li><a href="{{ url_for('dashboard_page') }}">User Management</a></li>
+            <li><a href="{{ url_for('api_key_management') }}">API Key Management</a></li>
+            <li><a href="{{ url_for('attack_executions') }}" class="active">Attack Executions</a></li>
+            <li><a href="{{ url_for('system_alerts') }}" >System Alerts</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <!-- A03: Attack Executions -->
+        <div id="attack-executions" class="page-content">
+            <h1>Attack Executions</h1>
+            <div class="header-divider"></div>
+            <div class="attack-executions-section">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Attack ID</th>
+                                <th>User</th>
+                                <th>Target App</th>
+                                <th>Intention</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Export Compliance Report</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ATK-001</td>
+                                <td>john_doe</td>
+                                <td>EleutherAI/gpt-neo-1.3B</td>
+                                <td>Content Manipulation</td>
+                                <td>2025-03-27</td>
+                                <td style="color: #28a745;">Success</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="exportComplianceReport('ATK-001')">Export</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ATK-002</td>
+                                <td>jane_smith</td>
+                                <td>OpenAI/gpt-3</td>
+                                <td>Prompt Leakage</td>
+                                <td>2025-03-26</td>
+                                <td style="color: #dc3545;">Failed</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="exportComplianceReport('ATK-002')">Export</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 2000;"></div>
+
+<!-- Include jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+<style>
+    /* Initially hide the content to prevent FOUC */
+    .hidden {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    :root {
+        --primary: #CA6E57;
+        --dark: #142A43;
+        --light: #5CA5C1;
+        --accent: #4A80A3;
+        --shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+        width: 250px;
+        background: linear-gradient(180deg, #142A43 0%, #1e3a5f 100%);
+        color: white;
+        height: 100vh;
+        position: fixed;
+        padding: 1rem;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .sidebar .logo img {
+        height: 32px;
+    }
+
+    .sidebar .logo h3 {
+        font-size: 1.2rem;
+        margin: 0;
+        color: white;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar ul li {
+        margin-bottom: 0.5rem;
+    }
+
+    .sidebar ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.75rem 1rem;
+        display: block;
+        border-radius: 0.5rem;
+        transition: var(--transition);
+    }
+
+    .sidebar ul li a:hover, .sidebar ul li a.active {
+        background: var(--primary);
+        transform: translateX(5px);
+    }
+
+    /* Main Content Styles */
+    .main-content {
+        margin-left: 250px;
+        padding: 2rem;
+        width: calc(100% - 250px);
+        background: linear-gradient(135deg, #f9fafb 50%, #e6e9ee 100%);
+        min-height: 100vh;
+    }
+
+    .main-content h1 {
+        color: var(--dark);
+        font-family: 'Inter', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .main-content .header-divider {
+        width: 50px;
+        height: 3px;
+        background: var(--primary);
+        margin: 0.5rem 0 2rem 0;
+        border-radius: 2px;
+    }
+
+    /* Attack Executions Section (A03) */
+    .attack-executions-section {
+        background-color: #fff;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 1.5rem;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+        padding: 1rem;
+        color: #555;
+    }
+
+    .table thead {
+        background: linear-gradient(90deg, var(--primary), #b85a4a);
+        color: white;
+    }
+
+    .table thead th {
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: var(--primary);
+        color: white;
+        transition: var(--transition);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(202, 110, 87, 0.4);
+    }
+
+    /* Toast Styles */
+    .toast {
+        background: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        max-width: 300px;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        transform: translateY(-10px);
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast.success {
+        border-left: 4px solid #28a745;
+    }
+
+    .toast.error {
+        border-left: 4px solid #dc3545;
+    }
+
+    .toast .toast-message {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+    .toast .toast-close {
+        cursor: pointer;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .toast .toast-close:hover {
+        color: var(--primary);
+    }
+</style>
+
+<script>
+    // Show content once the page is fully loaded
+    window.addEventListener('load', () => {
+        document.getElementById('page-content').classList.remove('hidden');
+        document.getElementById('page-content').classList.add('visible');
+    });
+
+    // A03: Attack Executions Functions
+    function showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <span class="toast-message">${message}</span>
+            <span class="toast-close" onclick="this.parentElement.remove()">×</span>
+        `;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => toast.remove(), 5000);
+    }
+
+    function exportComplianceReport(attackId) {
+        // Access jsPDF from the global scope (loaded via CDN)
+        const { jsPDF } = window.jspdf;
+        if (!jsPDF) {
+            showToast('jsPDF library not loaded. Please try again later.', 'error');
+            return;
+        }
+
+        // Placeholder data for the compliance report
+        const reports = {
+            'ATK-001': {
+                attack_id: 'ATK-001',
+                user: 'john_doe',
+                target_app: 'EleutherAI/gpt-neo-1.3B',
+                intention: 'Content Manipulation',
+                date: '2025-03-27',
+                status: 'Success',
+                findings: {
+                    vulnerabilities: 'Potential content manipulation detected.',
+                    risk_level: 'High',
+                    mitigation: 'Implement stricter input validation.'
+                },
+                execution_details: {
+                    steps: [
+                        'Initiated content manipulation attack.',
+                        'Bypassed input validation.',
+                        'Successfully altered generated content.'
+                    ],
+                    duration: '120 seconds',
+                    resources_used: 'API calls: 150, Compute: 2 CPU cores'
+                }
+            },
+            'ATK-002': {
+                attack_id: 'ATK-002',
+                user: 'jane_smith',
+                target_app: 'OpenAI/gpt-3',
+                intention: 'Prompt Leakage',
+                date: '2025-03-26',
+                status: 'Failed',
+                findings: {
+                    vulnerabilities: 'No prompt leakage detected.',
+                    risk_level: 'Low',
+                    mitigation: 'Continue monitoring for prompt leakage attempts.'
+                },
+                execution_details: {
+                    steps: [
+                        'Attempted prompt leakage attack.',
+                        'Failed to extract prompt due to security measures.'
+                    ],
+                    duration: '90 seconds',
+                    resources_used: 'API calls: 100, Compute: 1 CPU core'
+                }
+            }
+        };
+
+        const report = reports[attackId];
+        if (!report) {
+            showToast(`No report found for Attack ID: ${attackId}`, 'error');
+            return;
+        }
+
+        // Create a new PDF document
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // Set font and margins
+        const margin = 15;
+        let y = margin;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const maxLineWidth = pageWidth - 2 * margin;
+
+        // Helper function to add text with word wrapping
+        function addText(text, x, y, options = {}) {
+            const lines = doc.splitTextToSize(text, maxLineWidth);
+            doc.text(lines, x, y, options);
+            return y + lines.length * (options.lineHeight || 5);
+        }
+
+        // Title
+        doc.setFontSize(16);
+        doc.setFont('Helvetica', 'bold');
+        y = addText(`Compliance Report for Attack ID: ${report.attack_id}`, margin, y);
+
+        // Header Info
+        doc.setFontSize(12);
+        doc.setFont('Helvetica', 'normal');
+        y += 5;
+        y = addText(`Date: ${report.date}`, margin, y);
+        y = addText('FortiLLM Security Team', margin, y);
+
+        // Executive Summary
+        y += 10;
+        doc.setFontSize(14);
+        doc.setFont('Helvetica', 'bold');
+        y = addText('Executive Summary', margin, y);
+        doc.setFontSize(12);
+        doc.setFont('Helvetica', 'normal');
+        y = addText(`This report details the attack execution for ${report.attack_id}. It includes findings and execution details to ensure adherence to security standards.`, margin, y, { lineHeight: 6 });
+
+        // Attack Details
+        y += 10;
+        doc.setFontSize(14);
+        doc.setFont('Helvetica', 'bold');
+        y = addText('Attack Details', margin, y);
+        doc.setFontSize(12);
+        doc.setFont('Helvetica', 'normal');
+        y = addText(`User: ${report.user}`, margin, y);
+        y = addText(`Target Application: ${report.target_app}`, margin, y);
+        y = addText(`Intention: ${report.intention}`, margin, y);
+        y = addText(`Date: ${report.date}`, margin, y);
+        doc.setTextColor(report.status === 'Success' ? '#28a745' : '#dc3545');
+        y = addText(`Status: ${report.status}`, margin, y);
+        doc.setTextColor('#000000'); // Reset color
+
+        // Findings
+        y += 10;
+        doc.setFontSize(14);
+        doc.setFont('Helvetica', 'bold');
+        y = addText('Findings', margin, y);
+        doc.setFontSize(12);
+        doc.setFont('Helvetica', 'normal');
+        y = addText(`Vulnerabilities: ${report.findings.vulnerabilities}`, margin, y, { lineHeight: 6 });
+        y = addText(`Risk Level: ${report.findings.risk_level}`, margin, y);
+        y = addText(`Mitigation: ${report.findings.mitigation}`, margin, y, { lineHeight: 6 });
+
+        // Execution Details
+        y += 10;
+        doc.setFontSize(14);
+        doc.setFont('Helvetica', 'bold');
+        y = addText('Execution Details', margin, y);
+        doc.setFontSize(12);
+        doc.setFont('Helvetica', 'normal');
+        y = addText('Steps:', margin, y);
+        report.execution_details.steps.forEach(step => {
+            y = addText(`- ${step}`, margin + 5, y, { lineHeight: 6 });
+        });
+        y = addText(`Duration: ${report.execution_details.duration}`, margin, y);
+        y = addText(`Resources Used: ${report.execution_details.resources_used}`, margin, y);
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.setFont('Helvetica', 'normal');
+            doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        }
+
+        // Save the PDF
+        doc.save(`compliance_report_${report.attack_id}.pdf`);
+
+        showToast(`Compliance report for Attack ID: ${report.attack_id} exported as PDF successfully.`, 'success');
+    }
+</script>
+{% endblock %}
