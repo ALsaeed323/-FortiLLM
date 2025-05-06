@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}FortiLLM - System Alerts{% endblock %}
+
+{% block content %}
+<div style="display: flex;">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <br>
+        <br>
+        <ul>
+            <li><a href="{{ url_for('dashboard_page') }}">User Management</a></li>
+            <li><a href="{{ url_for('api_key_management') }}">API Key Management</a></li>
+            <li><a href="{{ url_for('attack_executions') }}" >Attack Executions</a></li>
+            <li><a href="{{ url_for('system_alerts') }}"  class="active">System Alerts</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+        <!-- A04: System Alerts -->
+        <div id="system-alerts" class="page-content">
+            <h1>System Alerts</h1>
+            <div class="header-divider"></div>
+            <div class="system-alerts-section">
+                <div class="alert alert-danger" style="border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 1rem;">
+                    <strong>Security Breach:</strong> Unauthorized access attempt detected on 2025-03-27 10:30 AM.
+                </div>
+                <div class="alert alert-warning" style="border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 1rem;">
+                    <strong>API Failure:</strong> Rate limit exceeded for API key sk-12345 on 2025-03-27 09:15 AM.
+                </div>
+                <div class="alert alert-info" style="border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    <strong>System Error:</strong> Temporary outage in data processing at 2025-03-26 03:00 PM.
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    :root {
+        --primary: #CA6E57;
+        --dark: #142A43;
+        --light: #5CA5C1;
+        --accent: #4A80A3;
+        --shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+        width: 250px;
+        background: linear-gradient(180deg, #142A43 0%, #1e3a5f 100%);
+        color: white;
+        height: 100vh;
+        position: fixed;
+        padding: 1rem;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar .logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .sidebar .logo img {
+        height: 32px;
+    }
+
+    .sidebar .logo h3 {
+        font-size: 1.2rem;
+        margin: 0;
+        color: white;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar ul li {
+        margin-bottom: 0.5rem;
+    }
+
+    .sidebar ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.75rem 1rem;
+        display: block;
+        border-radius: 0.5rem;
+        transition: var(--transition);
+    }
+
+    .sidebar ul li a:hover, .sidebar ul li a.active {
+        background: var(--primary);
+        transform: translateX(5px);
+    }
+
+    /* Main Content Styles */
+    .main-content {
+        margin-left: 250px;
+        padding: 2rem;
+        width: calc(100% - 250px);
+        background: linear-gradient(135deg, #f9fafb 50%, #e6e9ee 100%);
+        min-height: 100vh;
+    }
+
+    .main-content h1 {
+        color: var(--dark);
+        font-family: 'Inter', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 1rem 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .main-content .header-divider {
+        width: 50px;
+        height: 3px;
+        background: var(--primary);
+        margin: 0.5rem 0 2rem 0;
+        border-radius: 2px;
+    }
+
+    /* System Alerts Section (A04) */
+    .system-alerts-section {
+        background-color: #fff;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 1.5rem;
+    }
+
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid;
+        transition: var(--transition);
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffc107;
+        color: #856404;
+    }
+
+    .alert-info {
+        background-color: #cce5ff;
+        border-color: #17a2b8;
+        color: #0c5460;
+    }
+</style>
+{% endblock %}
