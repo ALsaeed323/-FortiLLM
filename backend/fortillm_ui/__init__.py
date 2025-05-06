@@ -24,6 +24,7 @@ app.secret_key = SECRET_KEY
 
 # MongoDB configuration
 # app.config['MONGO_URI'] = os.getenv("MONGO_URI", "mongodb://localhost:27017/market_db")
+#mongodb+srv://alsaead2110679:${process.env.PASSWORD}@cluster0.vnvsld0.mongodb.net
 
 # Session configuration
 app.config['SESSION_TYPE'] = 'filesystem'  # You can change this to 'mongodb' if using MongoDB for sessions

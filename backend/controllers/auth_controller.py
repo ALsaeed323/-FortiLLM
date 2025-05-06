@@ -13,6 +13,7 @@ def register_controller():
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
         verify_human = request.form.get("verify_human")
+        print("Received data:", first_name, last_name, email, password, confirm_password, verify_human)
 
         if not all([first_name, last_name, email, password, confirm_password]):
             return jsonify({"error": "All fields are required"}), 400
